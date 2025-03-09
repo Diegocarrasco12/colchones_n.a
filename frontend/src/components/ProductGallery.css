@@ -1,0 +1,69 @@
+.card {
+    background-color: rgba(0, 0, 0, 0.8);  
+    color: #f8f9fa; 
+    border: none; 
+    border-radius: 8px; 
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.5); 
+  }
+  
+  .card-img-top {
+    object-fit: cover; 
+    height: 200px; 
+    border-top-left-radius: 8px; 
+    border-top-right-radius: 8px;
+  }
+  
+  .card-body {
+    padding: 1.5rem;
+    text-align: center; 
+  }
+  
+  .card-footer {
+    display: flex; 
+    justify-content: space-between; 
+    padding: 1rem;
+  }
+  
+  .card-footer button {
+    padding: 0.5rem 1rem; 
+    font-size: 1rem; 
+    border-radius: 5px; 
+    transition: all 0.3s ease;
+  }
+  
+  /* Estilos para el botón Agregar */
+  .card-footer .btn-success {
+    background-color: #28a745; 
+    border-color: #28a745;
+  }
+  
+  .card-footer .btn-success:hover {
+    background-color: #218838;
+    border-color: #1e7e34;
+  }
+  
+  /* Estilos para el botón Detalles */
+  .card-footer .btn-primary {
+    background-color: #007bff; 
+    border-color: #007bff;
+  }
+  
+  .card-footer .btn-primary:hover {
+    background-color: #0056b3;
+    border-color: #004085;
+  }
+  
+  .section-title {
+    color: #f4a261;  
+    font-size: 2rem;
+    font-weight: bold;
+    text-align: center; 
+    margin-bottom: 1rem;
+  }
+  
+  /* Estilo para el contenedor principal */
+  .container-fluid {
+    background-color: rgba(0, 0, 0, 0.7);  
+    padding: 3rem 1rem;
+  }
+  
