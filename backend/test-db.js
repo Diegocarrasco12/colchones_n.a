@@ -6,13 +6,16 @@ const pool = new Pool({
   ssl: { rejectUnauthorized: false },
 });
 
-pool.connect()
-  .then((client) => {
+async function testConnection() {
+  try {
+    const client = await pool.connect();
     console.log("✅ Conexión exitosa a PostgreSQL 🚀");
+    const res = await client.query("SELECT NOW();");
+    console.log("📅 Fecha y hora del servidor:", res.rows[0]);
     client.release();
-  })
-  .catch((error) => {
+  } catch (error) {
     console.error("❌ Error de conexión a PostgreSQL:", error.message);
-  });
+  }
+}
 
-module.exports = pool;
+testConnection();
