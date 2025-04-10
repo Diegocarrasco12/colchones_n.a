@@ -1,23 +1,23 @@
 require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
+
+// Rutas
 const userRoutes = require("./routes/userRoutes");
 const productRoutes = require("./routes/productRoutes");
 
 const app = express();
 
-
 // 🔹 Configuración de CORS
 const corsOptions = {
-  
   origin: process.env.ALLOW_ORIGIN_URL,
   methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
   allowedHeaders: ["Content-Type", "Authorization"],
-  credentials: true, // ✅ Permitir credenciales (cookies, auth headers)
+  credentials: true,
 };
 
 app.use(cors(corsOptions));
-app.options("*", cors(corsOptions)); 
+app.options("*", cors(corsOptions));
 
 // 🔹 Middleware
 app.use(express.json());
@@ -34,7 +34,7 @@ app.use((req, res, next) => {
 
 // 🔹 Definir rutas
 app.use("/api/users", userRoutes);
-app.use("/api/products", productRoutes);
+app.use("/api/products", productRoutes); // ← YA FUNCIONAL
 
 // 🔹 Ruta raíz
 app.get("/", (req, res) => {
@@ -42,8 +42,8 @@ app.get("/", (req, res) => {
 });
 
 // 🔹 Manejo de errores 404
-app.use((err,req, res, next) => {
-  res.status(404).json({ error: err });
+app.use((req, res, next) => {
+  res.status(404).json({ error: "Ruta no encontrada" });
 });
 
 // 🔹 Manejo de errores global
