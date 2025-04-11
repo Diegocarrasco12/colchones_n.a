@@ -24,16 +24,20 @@ const ProductGallery = () => {
             <div className="col-md-4 mb-4" key={product.id}>
               <div className="card h-100 shadow-sm">
                 <img
-                  src={`/${product.image}`} 
+                  src={`/${product.image}`}
                   className="card-img-top"
                   alt={product.name}
                 />
-                <div className="card-body d-flex flex-column"> 
+                <div className="card-body d-flex flex-column">
                   <h5 className="card-title">{product.name}</h5>
                   <p className="card-text">${product.price.toLocaleString()} CLP</p>
                   <div className="mt-auto">
-                    <button className="btn btn-success me-2" onClick={() => addToCart(product)}>Agregar</button>
-                    <Link to={`/product/${product.id}`} className="btn btn-primary">Detalles</Link>
+                    <button className="btn btn-success me-2" onClick={() => addToCart(product)}>
+                      Agregar
+                    </button>
+                    <Link to={`/product/${product.id}`} className="btn btn-primary">
+                      Detalles
+                    </Link>
                   </div>
                 </div>
               </div>
