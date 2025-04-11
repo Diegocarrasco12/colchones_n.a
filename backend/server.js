@@ -5,6 +5,7 @@ const cors = require("cors");
 // Rutas
 const userRoutes = require("./routes/userRoutes");
 const productRoutes = require("./routes/productRoutes");
+const contactRoutes = require("./routes/contactRoutes"); 
 
 const app = express();
 
@@ -34,7 +35,8 @@ app.use((req, res, next) => {
 
 // 🔹 Definir rutas
 app.use("/api/users", userRoutes);
-app.use("/api/products", productRoutes); // ← YA FUNCIONAL
+app.use("/api/products", productRoutes); 
+app.use("/api/contact", contactRoutes);  
 
 // 🔹 Ruta raíz
 app.get("/", (req, res) => {

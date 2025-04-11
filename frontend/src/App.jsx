@@ -27,37 +27,37 @@ const App = () => {
           <main>
             <Suspense fallback={<div className="loading">Cargando...</div>}>
               <Routes>
-                {/* ✅ Pantalla de inicio con el compromiso de la empresa */}
-                <Route path="/" element={
-                  <>
-                    <MainContent />
-                    <ProductGallery />
-                  </>
-                } />
-
-                {/* ✅ Rutas públicas */}
+                <Route
+                  path="/"
+                  element={
+                    <>
+                      <MainContent />
+                      <ProductGallery />
+                    </>
+                  }
+                />
                 <Route path="/productos" element={<ProductGallery />} />
                 <Route path="/contacto" element={<ContactForm />} />
                 <Route path="/register" element={<RegisterForm />} />
                 <Route path="/login" element={<LoginForm />} />
                 <Route path="/product/:id" element={<ProductDetail />} />
                 <Route path="/cart" element={<Cart />} />
-
-                {/* ✅ Ruta protegida de perfil */}
-                <Route path="/profile" element={
-                  <PrivateRoute>
-                    <Profile />
-                  </PrivateRoute>
-                } />
-
-                {/* ✅ Rutas protegidas de administrador */}
-                <Route path="/admin/products" element={
-                  <PrivateRoute>
-                    <AdminProducts />
-                  </PrivateRoute>
-                } />
-
-                {/* ✅ Manejamos error 404 */}
+                <Route
+                  path="/profile"
+                  element={
+                    <PrivateRoute>
+                      <Profile />
+                    </PrivateRoute>
+                  }
+                />
+                <Route
+                  path="/admin/products"
+                  element={
+                    <PrivateRoute>
+                      <AdminProducts />
+                    </PrivateRoute>
+                  }
+                />
                 <Route path="*" element={<h2>Página no encontrada</h2>} />
               </Routes>
             </Suspense>
@@ -70,5 +70,4 @@ const App = () => {
 };
 
 export default App;
-
 
