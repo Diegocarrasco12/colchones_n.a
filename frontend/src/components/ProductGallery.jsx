@@ -3,12 +3,14 @@ import { Link } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import axios from "axios";
 
+// Ruta base a la API
 const apiURL = `${import.meta.env.VITE_API_BASE_URL}/api/products`;
 
 const ProductGallery = () => {
   const [products, setProducts] = useState([]);
   const { addToCart } = useAuth();
 
+  // Obtener productos desde el backend
   useEffect(() => {
     axios.get(apiURL)
       .then(response => setProducts(response.data))
@@ -24,7 +26,7 @@ const ProductGallery = () => {
             <div className="col-md-4 mb-4" key={product.id}>
               <div className="card h-100 shadow-sm">
                 <img
-                  src={`/${product.image}`}
+                  src={`/img/${product.image}`}
                   className="card-img-top"
                   alt={product.name}
                 />
@@ -40,7 +42,10 @@ const ProductGallery = () => {
                     >
                       Agregar
                     </button>
-                    <Link to={`/product/${product.id}`} className="btn btn-primary">
+                    <Link
+                      to={`/product/${product.id}`}
+                      className="btn btn-primary"
+                    >
                       Detalles
                     </Link>
                   </div>
@@ -57,4 +62,3 @@ const ProductGallery = () => {
 };
 
 export default ProductGallery;
-
