@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import axios from "axios";
@@ -30,9 +30,14 @@ const ProductGallery = () => {
                 />
                 <div className="card-body d-flex flex-column">
                   <h5 className="card-title">{product.name}</h5>
-                  <p className="card-text">${product.price.toLocaleString()} CLP</p>
+                  <p className="card-text">
+                    {product.price.toLocaleString()} CLP
+                  </p>
                   <div className="mt-auto">
-                    <button className="btn btn-success me-2" onClick={() => addToCart(product)}>
+                    <button
+                      className="btn btn-success me-2"
+                      onClick={() => addToCart(product)}
+                    >
                       Agregar
                     </button>
                     <Link to={`/product/${product.id}`} className="btn btn-primary">
@@ -44,7 +49,7 @@ const ProductGallery = () => {
             </div>
           ))
         ) : (
-          <p>Cargando productos...</p>
+          <p className="text-center">Cargando productos o no hay productos disponibles.</p>
         )}
       </div>
     </section>
@@ -52,3 +57,4 @@ const ProductGallery = () => {
 };
 
 export default ProductGallery;
+
