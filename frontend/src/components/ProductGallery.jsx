@@ -12,9 +12,12 @@ const ProductGallery = () => {
 
   // Obtener productos desde el backend
   useEffect(() => {
-    axios.get(apiURL)
-      .then(response => setProducts(response.data))
-      .catch(error => console.error("❌ Error al obtener productos:", error));
+    axios
+      .get(apiURL)
+      .then((response) => setProducts(response.data))
+      .catch((error) =>
+        console.error("❌ Error al obtener productos:", error)
+      );
   }, []);
 
   return (
@@ -27,8 +30,14 @@ const ProductGallery = () => {
               <div className="card h-100 shadow-sm">
                 <img
                   src={`/img/${product.image}`}
-                  className="card-img-top"
                   alt={product.name}
+                  style={{
+                    objectFit: "cover",
+                    width: "100%",
+                    height: "200px",
+                    borderTopLeftRadius: "0.5rem",
+                    borderTopRightRadius: "0.5rem"
+                  }}
                 />
                 <div className="card-body d-flex flex-column">
                   <h5 className="card-title">{product.name}</h5>
@@ -54,7 +63,9 @@ const ProductGallery = () => {
             </div>
           ))
         ) : (
-          <p className="text-center">Cargando productos o no hay productos disponibles.</p>
+          <p className="text-center">
+            Cargando productos o no hay productos disponibles.
+          </p>
         )}
       </div>
     </section>
