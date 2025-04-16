@@ -1,6 +1,5 @@
 const pool = require('../config/db');
 
-// Obtener todos los productos
 const getAllProducts = async (req, res) => {
   try {
     const result = await pool.query('SELECT * FROM colchones');
@@ -11,7 +10,6 @@ const getAllProducts = async (req, res) => {
   }
 };
 
-// Obtener un producto por ID
 const getProductById = async (req, res) => {
   const { id } = req.params;
   try {
@@ -26,7 +24,6 @@ const getProductById = async (req, res) => {
   }
 };
 
-// Crear un nuevo producto
 const createProduct = async (req, res) => {
   const { name, description, price, stock, image } = req.body;
   try {
@@ -41,7 +38,6 @@ const createProduct = async (req, res) => {
   }
 };
 
-// Actualizar un producto
 const updateProduct = async (req, res) => {
   const { id } = req.params;
   const { name, description, price, stock, image } = req.body;
@@ -73,7 +69,6 @@ const updateProduct = async (req, res) => {
   }
 };
 
-// Eliminar un producto
 const deleteProduct = async (req, res) => {
   const { id } = req.params;
   try {

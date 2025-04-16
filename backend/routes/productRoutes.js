@@ -9,11 +9,10 @@ const {
 } = require("../controllers/productController");
 
 // Rutas CRUD para productos
-router.get("/", getAllProducts);           // Obtener todos los productos
-router.get("/:id", getProductById);        // Obtener un producto por ID
-router.post("/", createProduct);           // Crear un nuevo producto
-router.put("/:id", updateProduct);         // Actualizar un producto
-router.delete("/:id", deleteProduct);      // Eliminar un producto
+router.get("/", getAllProducts);
+router.get("/:id", getProductById);
+router.post("/", createProduct);
+router.put("/:id", updateProduct);
+router.delete("/:id", deleteProduct);
 
 module.exports = router;
-
