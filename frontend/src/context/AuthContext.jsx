@@ -7,26 +7,43 @@ export const AuthProvider = ({ children }) => {
   const [token, setToken] = useState(localStorage.getItem("token"));
   const [cart, setCart] = useState(JSON.parse(localStorage.getItem("cart")) || []);
 
+  // 🔹 Cargar perfil del usuario al iniciar sesión
   useEffect(() => {
-    if (token) {
-      fetch(`${import.meta.env.VITE_API_BASE_URL}/api/users/profile`, {
-        headers: { Authorization: `Bearer ${token}` },
-      })
-        .then((res) => res.json())
-        .then((data) => {
-          setUser(data);
-          localStorage.setItem("user", JSON.stringify(data));
+    const fetchProfile = async () => {
+      try {
+        const res = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/auth/profile`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
         });
+
+        if (!res.ok) {
+          throw new Error("No se pudo obtener el perfil");
+        }
+
+        const data = await res.json();
+        setUser(data);
+        localStorage.setItem("user", JSON.stringify(data));
+      } catch (error) {
+        console.error("❌ Error al obtener el perfil:", error);
+        logout(); // cerrar sesión si el token es inválido
+      }
+    };
+
+    if (token) {
+      fetchProfile();
     }
   }, [token]);
 
+  // 🔹 Guardar el carrito en localStorage
   useEffect(() => {
     localStorage.setItem("cart", JSON.stringify(cart));
   }, [cart]);
 
+  // 🔹 Función de login
   const login = async (email, password) => {
     try {
-      const res = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/users/login`, {
+      const res = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/auth/login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password }),
@@ -51,6 +68,7 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
+  // 🔹 Cerrar sesión
   const logout = () => {
     localStorage.removeItem("token");
     localStorage.removeItem("user");
@@ -58,6 +76,7 @@ export const AuthProvider = ({ children }) => {
     setUser(null);
   };
 
+  // 🔹 Funciones del carrito
   const addToCart = (product) => {
     setCart((prevCart) => [...prevCart, product]);
   };
@@ -78,5 +97,6 @@ export const AuthProvider = ({ children }) => {
 };
 
 export const useAuth = () => useContext(AuthContext);
+
 
 

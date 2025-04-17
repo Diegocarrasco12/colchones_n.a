@@ -16,7 +16,7 @@ const LoginForm = () => {
     const success = await login(email, password);
     if (success) {
       alert("¡Inicio de sesión exitoso!");
-      navigate("/profile"); // ✅ Redirigir al perfil después del login
+      navigate("/profile");
     } else {
       setErrorMessage("Correo electrónico o contraseña incorrectos");
     }
@@ -56,4 +56,5 @@ const LoginForm = () => {
 };
 
 export default LoginForm;
+
 
