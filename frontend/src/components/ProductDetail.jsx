@@ -7,14 +7,22 @@ const ProductDetail = () => {
   const { id } = useParams();
   const { addToCart } = useAuth();
   const [product, setProduct] = useState(null);
+  const [error, setError] = useState(null);
 
   const apiURL = `${import.meta.env.VITE_API_BASE_URL}/api/products/${id}`;
 
   useEffect(() => {
     axios.get(apiURL)
-      .then(response => setProduct(response.data))
-      .catch(error => console.error("❌ Error al obtener detalle del producto:", error));
+      .then((response) => setProduct(response.data))
+      .catch((err) => {
+        console.error("❌ Error al obtener detalle del producto:", err);
+        setError("No se pudo cargar el producto. Inténtalo más tarde.");
+      });
   }, [id]);
+
+  if (error) {
+    return <div className="container py-5 text-center text-danger">{error}</div>;
+  }
 
   if (!product) {
     return <div className="container py-5 text-center text-light">Cargando detalles del producto...</div>;
@@ -25,17 +33,23 @@ const ProductDetail = () => {
       <div className="row">
         <div className="col-md-6">
           <img
-            src={`/${product.image}`}
+            src={`/${product.image}`} // ✅ Corrección: sin "/img/"
             alt={product.name}
             className="img-fluid rounded shadow"
             style={{ objectFit: "cover", height: "400px", width: "100%" }}
+            onError={(e) => {
+              e.target.onerror = null;
+              e.target.src = "/fallback.jpg"; // 🧠 imagen de respaldo si no carga
+            }}
           />
         </div>
         <div className="col-md-6">
           <h2>{product.name}</h2>
           <p><strong>Precio:</strong> ${product.price.toLocaleString()} CLP</p>
           <p><strong>Descripción:</strong> {product.description}</p>
-          <button className="btn btn-success mt-3" onClick={() => addToCart(product)}>Agregar al Carrito</button>
+          <button className="btn btn-success mt-3" onClick={() => addToCart(product)}>
+            Agregar al Carrito
+          </button>
         </div>
       </div>
     </section>
@@ -43,4 +57,5 @@ const ProductDetail = () => {
 };
 
 export default ProductDetail;
+
 
