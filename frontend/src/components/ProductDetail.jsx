@@ -15,8 +15,8 @@ const ProductDetail = () => {
     axios.get(apiURL)
       .then((response) => setProduct(response.data))
       .catch((err) => {
-        console.error("❌ Error al obtener detalle del producto:", err);
-        setError("No se pudo cargar el producto. Inténtalo más tarde.");
+        console.error("❌ Error al obtener el detalle del producto:", err);
+        setError("No se pudo cargar el producto");
       });
   }, [id]);
 
@@ -33,13 +33,13 @@ const ProductDetail = () => {
       <div className="row">
         <div className="col-md-6">
           <img
-            src={`/${product.image}`} // ✅ Corrección: sin "/img/"
+            src={`/img/${product.image}`}
             alt={product.name}
             className="img-fluid rounded shadow"
             style={{ objectFit: "cover", height: "400px", width: "100%" }}
             onError={(e) => {
               e.target.onerror = null;
-              e.target.src = "/fallback.jpg"; // 🧠 imagen de respaldo si no carga
+              e.target.src = "/img/no-image.jpg";
             }}
           />
         </div>
@@ -57,5 +57,3 @@ const ProductDetail = () => {
 };
 
 export default ProductDetail;
-
-
