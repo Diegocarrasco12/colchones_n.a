@@ -1,88 +1,98 @@
-import React, { useState } from 'react';
-import './ContactForm.css';
+import React, { useState } from "react";
+import axios from "axios";
+import API_BASE_URL from "../config";
 
 const ContactForm = () => {
   const [formData, setFormData] = useState({
-    name: '',
-    email: '',
-    message: '',
+    name: "",
+    email: "",
+    message: "",
   });
 
+  const [success, setSuccess] = useState(null);
+  const [error, setError] = useState(null);
+  const [loading, setLoading] = useState(false);
+
   const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData({
-      ...formData,
-      [name]: value,
-    });
+    setFormData((prev) => ({
+      ...prev,
+      [e.target.name]: e.target.value,
+    }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log('Formulario enviado:', formData);
-    alert('Gracias por contactarnos. Te responderemos pronto.');
-    setFormData({ name: '', email: '', message: '' });
+    setSuccess(null);
+    setError(null);
+    setLoading(true);
+
+    try {
+      const response = await axios.post(`${API_BASE_URL}/api/contact`, formData);
+      if (response.status === 200) {
+        setSuccess("✅ Tu mensaje ha sido enviado correctamente.");
+        setFormData({ name: "", email: "", message: "" });
+      } else {
+        setError("❌ Hubo un error al enviar tu mensaje.");
+      }
+    } catch (err) {
+      console.error("❌ Error al enviar formulario:", err);
+      setError("❌ No se pudo enviar tu mensaje. Inténtalo más tarde.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
-    <div className="container mt-5">
-      <div className="row justify-content-center">
-        <div className="col-md-6">
-          <h2 className="text-center text-light mb-4">Contáctanos</h2>
-          <form onSubmit={handleSubmit} className="bg-dark p-4 rounded shadow">
-            <div className="mb-3">
-              <label htmlFor="name" className="form-label text-light">
-                Nombre:
-              </label>
-              <input
-                type="text"
-                id="name"
-                name="name"
-                value={formData.name}
-                onChange={handleChange}
-                placeholder="Tu nombre"
-                className="form-control"
-                required
-              />
-            </div>
+    <div className="container mt-5 text-light">
+      <h2 className="text-center mb-4">Contáctanos</h2>
 
-            <div className="mb-3">
-              <label htmlFor="email" className="form-label text-light">
-                Correo Electrónico:
-              </label>
-              <input
-                type="email"
-                id="email"
-                name="email"
-                value={formData.email}
-                onChange={handleChange}
-                placeholder="Tu correo electrónico"
-                className="form-control"
-                required
-              />
-            </div>
+      {success && <div className="alert alert-success">{success}</div>}
+      {error && <div className="alert alert-danger">{error}</div>}
 
-            <div className="mb-3">
-              <label htmlFor="message" className="form-label text-light">
-                Mensaje:
-              </label>
-              <textarea
-                id="message"
-                name="message"
-                value={formData.message}
-                onChange={handleChange}
-                placeholder="Tu mensaje"
-                rows="5"
-                className="form-control"
-                required
-              ></textarea>
-            </div>
-
-            <button type="submit" className="btn btn-primary w-100">
-              Enviar
-            </button>
-          </form>
+      <form onSubmit={handleSubmit} className="bg-dark p-4 rounded shadow mx-auto" style={{ maxWidth: "600px" }}>
+        <div className="mb-3">
+          <label className="form-label">Nombre:</label>
+          <input
+            type="text"
+            className="form-control"
+            name="name"
+            value={formData.name}
+            onChange={handleChange}
+            placeholder="Tu nombre"
+            required
+          />
         </div>
-      </div>
+
+        <div className="mb-3">
+          <label className="form-label">Correo Electrónico:</label>
+          <input
+            type="email"
+            className="form-control"
+            name="email"
+            value={formData.email}
+            onChange={handleChange}
+            placeholder="Tu correo electrónico"
+            required
+          />
+        </div>
+
+        <div className="mb-3">
+          <label className="form-label">Mensaje:</label>
+          <textarea
+            className="form-control"
+            name="message"
+            rows="4"
+            value={formData.message}
+            onChange={handleChange}
+            placeholder="Tu mensaje"
+            required
+          ></textarea>
+        </div>
+
+        <button type="submit" className="btn btn-primary w-100" disabled={loading}>
+          {loading ? "Enviando..." : "Enviar"}
+        </button>
+      </form>
     </div>
   );
 };

@@ -1,8 +1,8 @@
 const express = require("express");
 const router = express.Router();
-const { handleContactForm } = require("../controllers/contactController");
+const { sendContactMessage } = require("../controllers/contactController");
 
-router.post("/", handleContactForm);
+// Ruta POST para enviar mensajes de contacto
+router.post("/", sendContactMessage);
 
 module.exports = router;
-
