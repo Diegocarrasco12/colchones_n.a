@@ -1,4 +1,5 @@
 const nodemailer = require("nodemailer");
+require("dotenv").config();
 
 // 📬 Ruta para recibir mensajes del formulario de contacto
 const sendContactMessage = async (req, res) => {
@@ -12,12 +13,15 @@ const sendContactMessage = async (req, res) => {
     // Configura el transporter
     const transporter = nodemailer.createTransport({
       host: process.env.MAIL_HOST,
-      port: process.env.MAIL_PORT,
+      port: parseInt(process.env.MAIL_PORT),
       secure: false,
       auth: {
         user: process.env.MAIL_USER,
-        pass: process.env.MAIL_PASS
-      }
+        pass: process.env.MAIL_PASS,
+      },
+      tls: {
+        rejectUnauthorized: false,
+      },
     });
 
     // Contenido del correo
@@ -43,3 +47,4 @@ const sendContactMessage = async (req, res) => {
 };
 
 module.exports = { sendContactMessage };
+

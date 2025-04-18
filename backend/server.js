@@ -1,12 +1,6 @@
 require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
-
-// Importar rutas actualizadas
-const authRoutes = require("./routes/authRoutes");       // ✅ rutas de autenticación
-const productRoutes = require("./routes/productRoutes");
-const contactRoutes = require("./routes/contactRoutes");
-
 const app = express();
 
 // 🔹 Configuración de CORS con variable de entorno
@@ -33,22 +27,27 @@ app.use((req, res, next) => {
   next();
 });
 
+// ✅ Importar rutas
+const authRoutes = require("./routes/authRoutes");       
+const productRoutes = require("./routes/productRoutes");
+const contactRoutes = require("./routes/contactRoutes");
+
 // 🔹 Rutas principales
-app.use("/api/auth", authRoutes);          // ✅ autenticación
+app.use("/api/auth", authRoutes);
 app.use("/api/products", productRoutes);
 app.use("/api/contact", contactRoutes);
 
-// 🔹 Ruta de prueba
+// 🔹 Ruta raíz de prueba
 app.get("/", (req, res) => {
   res.send("🚀 Backend funcionando correctamente!");
 });
 
-// 🔹 Error 404
+// 🔹 Manejo de rutas no encontradas
 app.use((req, res, next) => {
   res.status(404).json({ error: "Ruta no encontrada" });
 });
 
-// 🔹 Error global
+// 🔹 Manejo global de errores
 app.use((err, req, res, next) => {
   console.error("❌ Error en el servidor:", err);
   res.status(500).json({ error: "Error interno del servidor" });
@@ -59,3 +58,4 @@ const PORT = process.env.PORT || 3000;
 app.listen(PORT, "0.0.0.0", () => {
   console.log(`Servidor corriendo en el puerto ${PORT}`);
 });
+
