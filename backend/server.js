@@ -28,14 +28,16 @@ app.use((req, res, next) => {
 });
 
 // ✅ Importar rutas
-const authRoutes = require("./routes/authRoutes");       
+const authRoutes = require("./routes/authRoutes");
 const productRoutes = require("./routes/productRoutes");
 const contactRoutes = require("./routes/contactRoutes");
+const adminRoutes = require("./routes/adminRoutes");
 
 // 🔹 Rutas principales
 app.use("/api/auth", authRoutes);
 app.use("/api/products", productRoutes);
 app.use("/api/contact", contactRoutes);
+app.use("/api/admin", adminRoutes); // ✅ NUEVO: prefijo /api/admin
 
 // 🔹 Ruta raíz de prueba
 app.get("/", (req, res) => {
@@ -58,4 +60,5 @@ const PORT = process.env.PORT || 3000;
 app.listen(PORT, "0.0.0.0", () => {
   console.log(`Servidor corriendo en el puerto ${PORT}`);
 });
+
 
