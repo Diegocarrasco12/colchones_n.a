@@ -18,6 +18,9 @@ app.options("*", cors(corsOptions));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+// ✅ Servir archivos estáticos desde uploads (para imágenes de perfil, etc.)
+app.use("/uploads", express.static("uploads"));
+
 // 🔹 Encabezados CORS extra (opcional pero seguro)
 app.use((req, res, next) => {
   res.header("Access-Control-Allow-Origin", process.env.ALLOW_ORIGIN_URL || "*");
@@ -60,5 +63,6 @@ const PORT = process.env.PORT || 3000;
 app.listen(PORT, "0.0.0.0", () => {
   console.log(`Servidor corriendo en el puerto ${PORT}`);
 });
+
 
 
