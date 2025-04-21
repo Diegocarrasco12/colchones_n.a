@@ -10,7 +10,6 @@ const Header = () => {
       <div className="container">
         <Link className="navbar-brand" to="/">Colchones a Medida</Link>
 
-        {/* Botón de hamburguesa */}
         <button
           className="navbar-toggler"
           type="button"
@@ -23,7 +22,6 @@ const Header = () => {
           <span className="navbar-toggler-icon"></span>
         </button>
 
-        {/* Menú colapsable */}
         <div className="collapse navbar-collapse" id="navbarNav">
           <ul className="navbar-nav ms-auto">
             <li className="nav-item">
@@ -48,7 +46,10 @@ const Header = () => {
                   <span className="nav-link">Hola, {user.fullName}</span>
                 </li>
                 <li className="nav-item">
-                  <button className="btn btn-danger btn-sm" onClick={logout}>
+                  <Link className="nav-link" to="/profile">Mi Perfil</Link>
+                </li>
+                <li className="nav-item">
+                  <button className="btn btn-danger btn-sm ms-2" onClick={logout}>
                     Cerrar Sesión
                   </button>
                 </li>
