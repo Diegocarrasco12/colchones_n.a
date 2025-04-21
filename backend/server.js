@@ -12,7 +12,6 @@ if (!fs.existsSync(uploadDir)) {
   console.log("📁 Carpeta de uploads creada:", uploadDir);
 }
 
-// 🔹 Configuración de CORS (asegúrate de definir ALLOW_ORIGIN_URL en .env)
 const FRONTEND_URL = process.env.ALLOW_ORIGIN_URL;
 if (!FRONTEND_URL) {
   console.warn(
@@ -28,12 +27,16 @@ const corsOptions = {
 app.use(cors(corsOptions));
 app.options("*", cors(corsOptions));
 
-// 🔹 Middlewares generales
+// 🔹 Middlewares generales para parsear JSON y URL-encoded
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// ✅ Servir archivos estáticos de /uploads
+// ✅ Servir archivos estáticos de /uploads (perfil, productos, etc.)
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
+
+// 🔹 Importar middlewares de autenticación y autorización
+const authMiddleware = require("./middlewares/authMiddleware");
+const isAdmin = require("./middlewares/isAdmin");
 
 // 🔹 Importar rutas
 const authRoutes = require("./routes/authRoutes");
@@ -41,11 +44,21 @@ const productRoutes = require("./routes/productRoutes");
 const contactRoutes = require("./routes/contactRoutes");
 const adminRoutes = require("./routes/adminRoutes");
 
-// 🔹 Montar rutas
+// 🔹 Montar rutas públicas y de auth
 app.use("/api/auth", authRoutes);
 app.use("/api/products", productRoutes);
 app.use("/api/contact", contactRoutes);
+
+// 🔹 Montar rutas de administración
 app.use("/api/admin", adminRoutes);
+
+// 🔒 Para gestión de productos desde el panel de admin
+app.use(
+  "/api/admin/products",
+  authMiddleware,
+  isAdmin,
+  productRoutes
+);
 
 // 🔹 Ruta raíz de prueba
 app.get("/", (req, res) => {
@@ -68,6 +81,7 @@ const PORT = process.env.PORT || 3000;
 app.listen(PORT, "0.0.0.0", () => {
   console.log(`Servidor corriendo en el puerto ${PORT}`);
 });
+
 
 
 

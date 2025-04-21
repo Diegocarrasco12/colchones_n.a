@@ -28,6 +28,7 @@ const Header = () => {
             <li className="nav-item">
               <Link className="nav-link" to="/contacto">Contacto</Link>
             </li>
+
             {!user ? (
               <>
                 <li className="nav-item">
@@ -42,13 +43,27 @@ const Header = () => {
                 <li className="nav-item">
                   <span className="nav-link">Hola, {user.fullName}</span>
                 </li>
+                {/* Nuevo: Enlace a Mi Perfil */}
                 <li className="nav-item">
-                  <button className="btn btn-danger btn-sm" onClick={logout}>Cerrar Sesión</button>
+                  <Link className="nav-link" to="/profile">Mi Perfil</Link>
+                </li>
+                <li className="nav-item">
+                  <button
+                    className="btn btn-danger btn-sm"
+                    onClick={() => {
+                      logout();
+                    }}
+                  >
+                    Cerrar Sesión
+                  </button>
                 </li>
               </>
             )}
+
             <li className="nav-item">
-              <Link className="nav-link" to="/cart">🛒 Carrito ({cart.length})</Link>
+              <Link className="nav-link" to="/cart">
+                🛒 Carrito ({cart.length})
+              </Link>
             </li>
           </ul>
         </div>
