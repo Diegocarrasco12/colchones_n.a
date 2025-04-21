@@ -2,29 +2,36 @@
 html, body, #root {
   height: 100%;
   margin: 0;
+  padding: 0;
 }
 
+/* Contenedor principal de la app */
 .app-container {
   display: flex;
   flex-direction: column;
   min-height: 100vh;
 }
 
+/* Área de contenido que empuja el footer hacia abajo */
 .main-content {
   flex: 1;
+  display: flex;
+  flex-direction: column;
 }
 
-/* Fondo y tipografía generales */
+/* Fondo extendido correctamente */
 body {
-  background: url('/img/background-image.jpg') no-repeat center center;
+  background: url('/img/background-image.jpg') no-repeat center center fixed;
   background-size: cover;
+  background-attachment: fixed;
+  background-repeat: no-repeat;
   color: #f8f9fa;
   font-family: 'Arial', sans-serif;
 }
 
-/* Color de los encabezados */
+/* Encabezados blancos */
 h1, h2, h3, h4, h5, h6 {
-  color: #ffffff; 
+  color: #ffffff;
 }
 
 /* Mobile: fuentes y botones más compactos */
