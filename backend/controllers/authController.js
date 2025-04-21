@@ -68,7 +68,7 @@ const login = async (req, res) => {
         name: user.rows[0].name,
         email: user.rows[0].email,
         role: user.rows[0].role,
-        profileImage: user.rows[0].profileimage || null,
+        profileImage: user.rows[0].profile_image || null,
       },
     });
   } catch (error) {
@@ -81,7 +81,7 @@ const login = async (req, res) => {
 const getProfile = async (req, res) => {
   try {
     const user = await db.query(
-      'SELECT id, name, email, role, profileimage FROM users WHERE id = $1',
+      'SELECT id, name, email, role, profile_image FROM users WHERE id = $1',
       [req.user.id]
     );
 
@@ -90,8 +90,11 @@ const getProfile = async (req, res) => {
     }
 
     res.json({
-      ...user.rows[0],
-      profileImage: user.rows[0].profileimage || null,
+      id: user.rows[0].id,
+      name: user.rows[0].name,
+      email: user.rows[0].email,
+      role: user.rows[0].role,
+      profileImage: user.rows[0].profile_image || null,
     });
   } catch (error) {
     console.error("❌ Error al obtener perfil:", error);
@@ -100,5 +103,6 @@ const getProfile = async (req, res) => {
 };
 
 module.exports = { register, login, getProfile };
+
 
 
