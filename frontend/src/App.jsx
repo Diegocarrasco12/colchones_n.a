@@ -16,6 +16,7 @@ const RegisterForm = lazy(() => import("./components/RegisterForm"));
 const LoginForm = lazy(() => import("./components/LoginForm"));
 const ProductDetail = lazy(() => import("./components/ProductDetail"));
 const AdminProducts = lazy(() => import("./components/AdminProducts"));
+const AdminDashboard = lazy(() => import("./components/AdminDashboard")); // ✅ Nuevo
 const Cart = lazy(() => import("./components/Cart"));
 
 const App = () => {
@@ -42,6 +43,7 @@ const App = () => {
                 <Route path="/login" element={<LoginForm />} />
                 <Route path="/product/:id" element={<ProductDetail />} />
                 <Route path="/cart" element={<Cart />} />
+
                 <Route
                   path="/profile"
                   element={
@@ -50,6 +52,16 @@ const App = () => {
                     </PrivateRoute>
                   }
                 />
+
+                <Route
+                  path="/admin"
+                  element={
+                    <PrivateRoute>
+                      <AdminDashboard />
+                    </PrivateRoute>
+                  }
+                />
+
                 <Route
                   path="/admin/products"
                   element={
@@ -58,6 +70,7 @@ const App = () => {
                     </PrivateRoute>
                   }
                 />
+
                 <Route path="*" element={<h2>Página no encontrada</h2>} />
               </Routes>
             </Suspense>
@@ -70,4 +83,6 @@ const App = () => {
 };
 
 export default App;
+
+
 
