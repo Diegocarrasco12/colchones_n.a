@@ -1,7 +1,16 @@
 require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
+const fs = require("fs");
+const path = require("path");
 const app = express();
+
+// 🔹 Crear carpeta uploads/profile_images si no existe
+const uploadDir = path.join(__dirname, "uploads/profile_images");
+if (!fs.existsSync(uploadDir)) {
+  fs.mkdirSync(uploadDir, { recursive: true });
+  console.log("📁 Carpeta de uploads creada:", uploadDir);
+}
 
 // 🔹 Configuración de CORS con variable de entorno
 const corsOptions = {
@@ -40,7 +49,7 @@ const adminRoutes = require("./routes/adminRoutes");
 app.use("/api/auth", authRoutes);
 app.use("/api/products", productRoutes);
 app.use("/api/contact", contactRoutes);
-app.use("/api/admin", adminRoutes); // ✅ NUEVO: prefijo /api/admin
+app.use("/api/admin", adminRoutes); // 
 
 // 🔹 Ruta raíz de prueba
 app.get("/", (req, res) => {
@@ -63,6 +72,7 @@ const PORT = process.env.PORT || 3000;
 app.listen(PORT, "0.0.0.0", () => {
   console.log(`Servidor corriendo en el puerto ${PORT}`);
 });
+
 
 
 

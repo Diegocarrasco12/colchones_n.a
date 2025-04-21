@@ -1,48 +1,98 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useAuth } from "../context/AuthContext";
 import { useNavigate } from "react-router-dom";
-import ProfileImageUploader from "./ProfileImageUploader";
+import axios from "axios";
 
 const Profile = () => {
-  const { user, logout } = useAuth();
+  const { user, logout, token } = useAuth();
   const navigate = useNavigate();
+  const fileInputRef = useRef(null);
+  const [preview, setPreview] = useState(null);
+  const [error, setError] = useState("");
 
   useEffect(() => {
-    if (!user) {
-      navigate("/login");
+    if (!user) navigate("/login");
+
+    if (user?.profileImage) {
+      setPreview(`${import.meta.env.VITE_API_BASE_URL}/${user.profileImage}`);
+    } else {
+      setPreview("/img/default_avatar.png");
     }
   }, [user, navigate]);
 
-  if (!user) {
-    return null;
-  }
+  const handleImageClick = () => {
+    fileInputRef.current.click();
+  };
+
+  const handleFileChange = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    const formData = new FormData();
+    formData.append("profileImage", file);
+
+    try {
+      await axios.put(
+        `${import.meta.env.VITE_API_BASE_URL}/api/auth/profile-image`,
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      setPreview(URL.createObjectURL(file)); 
+      setError("");
+    } catch (err) {
+      console.error("❌ Error al subir imagen:", err);
+      setError("Error al subir imagen.");
+    }
+  };
+
+  if (!user) return null;
 
   return (
-    <div className="container mt-5 text-light">
-      <h2>Perfil de {user.fullName || user.name || "Usuario"}</h2>
-      <p><strong>Email:</strong> {user.email}</p>
+    <div className="container mt-5 text-light text-center">
+      <h2>Perfil de {user.fullName || user.name}</h2>
+      <p>
+        <strong>Email:</strong> {user.email}
+      </p>
 
-      {/* Mostrar imagen de perfil si existe */}
-      {user.profile_image && (
-        <div className="mb-3">
+      <div className="mt-4">
+        <h5>Cambiar Foto de Perfil</h5>
+        <div
+          onClick={handleImageClick}
+          style={{
+            width: "150px",
+            height: "150px",
+            borderRadius: "8px",
+            overflow: "hidden",
+            margin: "0 auto 10px",
+            cursor: "pointer",
+            border: "2px solid #ccc",
+          }}
+        >
           <img
-            src={`${import.meta.env.VITE_API_BASE_URL}/${user.profile_image}`}
+            src={preview}
             alt="Foto de perfil"
-            style={{ width: "150px", height: "150px", borderRadius: "50%", objectFit: "cover" }}
+            style={{ width: "100%", height: "100%", objectFit: "cover" }}
           />
         </div>
-      )}
 
-      {/* Solo si es admin, mostrar el formulario para subir imagen */}
-      {user.role === "admin" && <ProfileImageUploader />}
+        <input
+          type="file"
+          accept="image/*"
+          ref={fileInputRef}
+          onChange={handleFileChange}
+          style={{ display: "none" }}
+        />
 
-      <button
-        className="btn btn-danger mt-4"
-        onClick={() => {
-          logout();
-          navigate("/");
-        }}
-      >
+        {error && <p className="text-danger">{error}</p>}
+      </div>
+
+      <button className="btn btn-danger mt-4" onClick={() => { logout(); navigate("/"); }}>
         Cerrar Sesión
       </button>
     </div>
