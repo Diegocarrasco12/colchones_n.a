@@ -9,59 +9,129 @@ const Profile = () => {
   const { user, logout, token } = useAuth();
   const navigate = useNavigate();
   const fileInputRef = useRef(null);
+
+  // Vista previa de la imagen y posibles errores
   const [preview, setPreview] = useState("/img/default_avatar.png");
   const [error, setError] = useState("");
-  
-  // Nuevo: estado para clientes y productos
+
+  // Datos de admin: clientes y productos
   const [clients, setClients] = useState([]);
   const [products, setProducts] = useState([]);
 
+  // Al cargar perfil
   useEffect(() => {
-    if (!user) return navigate("/login");
+    if (!user) {
+      navigate("/login");
+      return;
+    }
+    // Si ya hay imagen en user, la pongo de preview
     if (user.profileImage) {
       setPreview(`${apiURL}/${user.profileImage}`);
     }
     // Si es admin, cargo clientes y productos
     if (user.role === "admin") {
-      axios.get(`${apiURL}/api/admin/users`)
-        .then(res => setClients(res.data))
+      axios
+        .get(`${apiURL}/api/admin/users`)
+        .then((res) => setClients(res.data))
         .catch(console.error);
 
-      axios.get(`${apiURL}/api/products`)
-        .then(res => setProducts(res.data))
+      axios
+        .get(`${apiURL}/api/products`)
+        .then((res) => setProducts(res.data))
         .catch(console.error);
     }
-  }, [user]);
+  }, [user, navigate]);
 
-  /* … el resto de lo que ya tenías para subir la foto … */
+  // Hace click en el div para abrir selector
+  const handleImageClick = () => {
+    fileInputRef.current.click();
+  };
+
+  // Subida de archivo
+  const handleFileChange = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    const formData = new FormData();
+    formData.append("avatar", file);
+
+    try {
+      const res = await axios.put(
+        `${apiURL}/api/auth/profile-image`,
+        formData,
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+
+      // Actualizo vista previa con el archivo local
+      setPreview(URL.createObjectURL(file));
+      setError("");
+    } catch (err) {
+      console.error("❌ Error al subir imagen:", err.response || err);
+      setError("Error al subir imagen.");
+    }
+  };
 
   if (!user) return null;
 
   return (
     <div className="container mt-5 text-light">
       <h2 className="text-center">Perfil de {user.fullName || user.name}</h2>
-      <p className="text-center"><strong>Email:</strong> {user.email}</p>
+      <p className="text-center">
+        <strong>Email:</strong> {user.email}
+      </p>
 
-      {/* Foto de perfil */}
+      {/* — Foto de perfil clicable — */}
       <div className="text-center mb-5">
-        {/* … tu recuadro clicable con preview … */}
+        <h5>Cambiar Foto de Perfil</h5>
+        <div
+          onClick={handleImageClick}
+          style={{
+            width: "150px",
+            height: "150px",
+            borderRadius: "8px",
+            overflow: "hidden",
+            margin: "0 auto 10px",
+            cursor: "pointer",
+            border: "2px solid #ccc",
+          }}
+        >
+          <img
+            src={preview}
+            alt="Foto de perfil"
+            onError={(e) => {
+              e.target.onerror = null;
+              e.target.src = "/img/default_avatar.png";
+            }}
+            style={{ width: "100%", height: "100%", objectFit: "cover" }}
+          />
+        </div>
+        <input
+          type="file"
+          accept="image/*"
+          ref={fileInputRef}
+          onChange={handleFileChange}
+          style={{ display: "none" }}
+        />
+        {error && <p className="text-danger">{error}</p>}
       </div>
 
-      {/* --- Sección de ADMIN only --- */}
+      {/* — Sección ADMIN (solo si role === 'admin') — */}
       {user.role === "admin" && (
         <>
-          {/* 1) Lista de Clientes */}
+          {/* Lista de Clientes */}
           <div className="card mb-4">
             <div className="card-header">Clientes Registrados</div>
             <div className="card-body p-0">
               <table className="table table-striped mb-0">
                 <thead>
                   <tr>
-                    <th>Nombre</th><th>Email</th><th>Rol</th>
+                    <th>Nombre</th>
+                    <th>Email</th>
+                    <th>Rol</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {clients.map(c => (
+                  {clients.map((c) => (
                     <tr key={c.id}>
                       <td>{c.full_name}</td>
                       <td>{c.email}</td>
@@ -73,24 +143,26 @@ const Profile = () => {
             </div>
           </div>
 
-          {/* 2) Gestión de Productos */}
+          {/* Gestión de Productos */}
           <div className="card mb-4">
             <div className="card-header">Gestión de Productos</div>
             <div className="card-body">
-              {/* 
-                Aquí podrías reutilizar tu componente de CRUD de productos, 
-                o incluir un listado + botones “Editar” / “Borrar” / “Agregar”:
-              */}
-              {products.map(p => (
-                <div key={p.id} className="d-flex justify-content-between align-items-center mb-2">
-                  <span>{p.name} — ${p.price}</span>
+              {products.map((p) => (
+                <div
+                  key={p.id}
+                  className="d-flex justify-content-between align-items-center mb-2"
+                >
+                  <span>
+                    {p.name} — ${p.price}
+                  </span>
                   <div>
-                    <button className="btn btn-sm btn-warning me-2">Editar</button>
+                    <button className="btn btn-sm btn-warning me-2">
+                      Editar
+                    </button>
                     <button className="btn btn-sm btn-danger">Borrar</button>
                   </div>
                 </div>
               ))}
-
               <button className="btn btn-sm btn-success">
                 Agregar Nuevo Producto
               </button>
@@ -99,13 +171,18 @@ const Profile = () => {
         </>
       )}
 
-      {/* --- Botones de acción comunes --- */}
+      {/* — Botones de navegación — */}
       <div className="d-flex justify-content-center gap-3">
-        <button className="btn btn-primary" onClick={() => navigate("/")}>
+        <button
+          className="btn btn-primary"
+          onClick={() => navigate("/")}
+        >
           Volver al Inicio
         </button>
-        {/* Nuevo: siempre visible, para volver al perfil desde cualquier página */}
-        <button className="btn btn-secondary" onClick={() => navigate("/profile")}>
+        <button
+          className="btn btn-secondary"
+          onClick={() => navigate("/profile")}
+        >
           Mi Perfil
         </button>
         <button
@@ -123,5 +200,6 @@ const Profile = () => {
 };
 
 export default Profile;
+
 
 
