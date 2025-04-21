@@ -5,27 +5,29 @@ import Footer from "./components/Footer";
 import { AuthProvider } from "./context/AuthContext";
 import PrivateRoute from "./components/PrivateRoute";
 import Profile from "./components/Profile";
-import "./styles/global.css";
+import "./styles/global.css";              
 import "bootstrap/dist/css/bootstrap.min.css";
 
 // Lazy loading
-const MainContent = lazy(() => import("./components/MainContent"));
-const ContactForm = lazy(() => import("./components/ContactForm"));
+const MainContent    = lazy(() => import("./components/MainContent"));
+const ContactForm    = lazy(() => import("./components/ContactForm"));
 const ProductGallery = lazy(() => import("./components/ProductGallery"));
-const RegisterForm = lazy(() => import("./components/RegisterForm"));
-const LoginForm = lazy(() => import("./components/LoginForm"));
-const ProductDetail = lazy(() => import("./components/ProductDetail"));
-const AdminProducts = lazy(() => import("./components/AdminProducts"));
-const AdminDashboard = lazy(() => import("./components/AdminDashboard")); // ✅ Nuevo
-const Cart = lazy(() => import("./components/Cart"));
+const RegisterForm   = lazy(() => import("./components/RegisterForm"));
+const LoginForm      = lazy(() => import("./components/LoginForm"));
+const ProductDetail  = lazy(() => import("./components/ProductDetail"));
+const AdminProducts  = lazy(() => import("./components/AdminProducts"));
+const AdminDashboard = lazy(() => import("./components/AdminDashboard"));
+const Cart           = lazy(() => import("./components/Cart"));
 
 const App = () => {
   return (
     <AuthProvider>
       <Router>
-        <div className="app-container">
+        <div className="App">
           <Header />
-          <main>
+
+          {/* Este <main> ahora empuja el footer hacia abajo */}
+          <main className="main-content">
             <Suspense fallback={<div className="loading">Cargando...</div>}>
               <Routes>
                 <Route
@@ -75,6 +77,7 @@ const App = () => {
               </Routes>
             </Suspense>
           </main>
+
           <Footer />
         </div>
       </Router>
@@ -83,6 +86,3 @@ const App = () => {
 };
 
 export default App;
-
-
-

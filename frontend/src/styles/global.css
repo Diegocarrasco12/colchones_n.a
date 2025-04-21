@@ -9,3 +9,22 @@ body {
     color: #ffffff; 
   }
   
+  /* Mobile: fuentes y botones más compactos */
+@media (max-width: 576px) {
+  .navbar-brand {
+    font-size: 1rem;
+  }
+  .nav-link {
+    font-size: 0.9rem;
+    padding: 0.4rem 0.6rem;
+  }
+  .btn {
+    padding: 0.35rem 0.65rem;
+    font-size: 0.85rem;
+  }
+}
+
+/* Que las tablas (admin, carrito) hagan scroll horizontal si es muy angosto */
+.table-responsive {
+  overflow-x: auto;
+}

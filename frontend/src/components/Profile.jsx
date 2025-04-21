@@ -173,50 +173,52 @@ const Profile = () => {
           <div className="card mb-4">
             <div className="card-header">Clientes Registrados</div>
             <div className="card-body p-0">
-              <table className="table table-striped mb-0">
-                <thead>
-                  <tr>
-                    <th>Nombre</th>
-                    <th>Email</th>
-                    <th>Rol</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {clients.map((c) => (
-                    <tr key={c.id}>
-                      <td>{c.full_name}</td>
-                      <td>{c.email}</td>
-                      <td>
-                        <select
-                          className="form-select form-select-sm"
-                          value={c.role}
-                          onChange={(e) =>
-                            axios
-                              .put(
-                                `${apiURL}/api/admin/users/${c.id}/role`,
-                                { role: e.target.value },
-                                { headers: { Authorization: `Bearer ${token}` } }
-                              )
-                              .then(() =>
-                                setClients((prev) =>
-                                  prev.map((u) =>
-                                    u.id === c.id
-                                      ? { ...u, role: e.target.value }
-                                      : u
+              <div className="table-responsive">
+                <table className="table table-striped mb-0">
+                  <thead>
+                    <tr>
+                      <th>Nombre</th>
+                      <th>Email</th>
+                      <th>Rol</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {clients.map((c) => (
+                      <tr key={c.id}>
+                        <td>{c.full_name}</td>
+                        <td>{c.email}</td>
+                        <td>
+                          <select
+                            className="form-select form-select-sm"
+                            value={c.role}
+                            onChange={(e) =>
+                              axios
+                                .put(
+                                  `${apiURL}/api/admin/users/${c.id}/role`,
+                                  { role: e.target.value },
+                                  { headers: { Authorization: `Bearer ${token}` } }
+                                )
+                                .then(() =>
+                                  setClients((prev) =>
+                                    prev.map((u) =>
+                                      u.id === c.id
+                                        ? { ...u, role: e.target.value }
+                                        : u
+                                    )
                                   )
                                 )
-                              )
-                              .catch(console.error)
-                          }
-                        >
-                          <option value="user">user</option>
-                          <option value="admin">admin</option>
-                        </select>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
+                                .catch(console.error)
+                            }
+                          >
+                            <option value="user">user</option>
+                            <option value="admin">admin</option>
+                          </select>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
             </div>
           </div>
 
@@ -288,6 +290,7 @@ const Profile = () => {
 };
 
 export default Profile;
+
 
 
 

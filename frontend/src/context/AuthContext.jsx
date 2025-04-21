@@ -81,6 +81,7 @@ export const AuthProvider = ({ children }) => {
     setUser(null);
   };
 
+  // Actualizar usuario en contexto y localStorage
   const updateUser = (newUser) => {
     setUser(newUser);
     localStorage.setItem("user", JSON.stringify(newUser));
@@ -88,8 +89,14 @@ export const AuthProvider = ({ children }) => {
 
   // Carrito
   const addToCart = (product) => setCart((prev) => [...prev, product]);
-  const removeFromCart = (id) =>
-    setCart((prev) => prev.filter((item) => item.id !== id));
+  const removeFromCart = (productId) =>
+    setCart((prevCart) => {
+      const index = prevCart.findIndex((item) => item.id === productId);
+      if (index === -1) return prevCart;
+      const newCart = [...prevCart];
+      newCart.splice(index, 1);
+      return newCart;
+    });
   const clearCart = () => setCart([]);
 
   return (
@@ -103,7 +110,7 @@ export const AuthProvider = ({ children }) => {
         addToCart,
         removeFromCart,
         clearCart,
-        updateUser,     // <-- lo exponemos aquí
+        updateUser,
       }}
     >
       {children}
@@ -112,4 +119,3 @@ export const AuthProvider = ({ children }) => {
 };
 
 export const useAuth = () => useContext(AuthContext);
-
