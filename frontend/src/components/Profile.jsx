@@ -10,7 +10,7 @@ const Profile = () => {
   const navigate = useNavigate();
   const fileInputRef = useRef(null);
 
-  // Vista previa de la imagen y posibles errores
+  // Estado de la foto y posible error
   const [preview, setPreview] = useState("/img/default_avatar.png");
   const [error, setError] = useState("");
 
@@ -18,36 +18,38 @@ const Profile = () => {
   const [clients, setClients] = useState([]);
   const [products, setProducts] = useState([]);
 
-  // Al cargar perfil
+  // Al montar o cambiar user, cargo preview, clientes y productos
   useEffect(() => {
     if (!user) {
       navigate("/login");
       return;
     }
-    // Si ya hay imagen en user, la pongo de preview
+
     if (user.profileImage) {
       setPreview(`${apiURL}/${user.profileImage}`);
     }
-    // Si es admin, cargo clientes y productos
+
     if (user.role === "admin") {
+      // Cargo lista de clientes
       axios
-        .get(`${apiURL}/api/admin/users`)
+        .get(`${apiURL}/api/admin/users`, {
+          headers: { Authorization: `Bearer ${token}` },
+        })
         .then((res) => setClients(res.data))
         .catch(console.error);
 
+      // Cargo productos
       axios
         .get(`${apiURL}/api/products`)
         .then((res) => setProducts(res.data))
         .catch(console.error);
     }
-  }, [user, navigate]);
+  }, [user, navigate, token]);
 
-  // Hace click en el div para abrir selector
-  const handleImageClick = () => {
-    fileInputRef.current.click();
-  };
+  // Abrir selector de archivo
+  const handleImageClick = () => fileInputRef.current.click();
 
-  // Subida de archivo
+  // Subir nueva foto
   const handleFileChange = async (e) => {
     const file = e.target.files[0];
     if (!file) return;
@@ -56,18 +58,37 @@ const Profile = () => {
     formData.append("avatar", file);
 
     try {
-      const res = await axios.put(
+      await axios.put(
         `${apiURL}/api/auth/profile-image`,
         formData,
         { headers: { Authorization: `Bearer ${token}` } }
       );
-
-      // Actualizo vista previa con el archivo local
       setPreview(URL.createObjectURL(file));
       setError("");
     } catch (err) {
       console.error("❌ Error al subir imagen:", err.response || err);
       setError("Error al subir imagen.");
+    }
+  };
+
+  // NUEVO: Cambiar rol de un usuario
+  const handleRoleChange = async (userId, newRole) => {
+    try {
+      await axios.put(
+        `${apiURL}/api/admin/users/${userId}/role`,
+        { role: newRole },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      // Actualizo estado local
+      setClients((prev) =>
+        prev.map((c) =>
+          c.id === userId
+            ? { ...c, role: newRole }
+            : c
+        )
+      );
+    } catch (err) {
+      console.error("❌ Error al cambiar rol:", err.response || err);
     }
   };
 
@@ -118,7 +139,7 @@ const Profile = () => {
       {/* — Sección ADMIN (solo si role === 'admin') — */}
       {user.role === "admin" && (
         <>
-          {/* Lista de Clientes */}
+          {/* Lista de Clientes con selector de rol */}
           <div className="card mb-4">
             <div className="card-header">Clientes Registrados</div>
             <div className="card-body p-0">
@@ -135,7 +156,18 @@ const Profile = () => {
                     <tr key={c.id}>
                       <td>{c.full_name}</td>
                       <td>{c.email}</td>
-                      <td>{c.role}</td>
+                      <td>
+                        <select
+                          className="form-select form-select-sm"
+                          value={c.role}
+                          onChange={(e) =>
+                            handleRoleChange(c.id, e.target.value)
+                          }
+                        >
+                          <option value="user">user</option>
+                          <option value="admin">admin</option>
+                        </select>
+                      </td>
                     </tr>
                   ))}
                 </tbody>
@@ -159,7 +191,9 @@ const Profile = () => {
                     <button className="btn btn-sm btn-warning me-2">
                       Editar
                     </button>
-                    <button className="btn btn-sm btn-danger">Borrar</button>
+                    <button className="btn btn-sm btn-danger">
+                      Borrar
+                    </button>
                   </div>
                 </div>
               ))}
@@ -173,16 +207,10 @@ const Profile = () => {
 
       {/* — Botones de navegación — */}
       <div className="d-flex justify-content-center gap-3">
-        <button
-          className="btn btn-primary"
-          onClick={() => navigate("/")}
-        >
+        <button className="btn btn-primary" onClick={() => navigate("/")}>
           Volver al Inicio
         </button>
-        <button
-          className="btn btn-secondary"
-          onClick={() => navigate("/profile")}
-        >
+        <button className="btn btn-secondary" onClick={() => navigate("/profile")}>
           Mi Perfil
         </button>
         <button
@@ -200,6 +228,7 @@ const Profile = () => {
 };
 
 export default Profile;
+
 
 
 
