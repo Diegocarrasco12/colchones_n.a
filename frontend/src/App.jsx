@@ -1,14 +1,16 @@
 import React, { Suspense, lazy } from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+
 import Header from "./components/Header";
 import Footer from "./components/Footer";
 import { AuthProvider } from "./context/AuthContext";
 import PrivateRoute from "./components/PrivateRoute";
 import Profile from "./components/Profile";
-import "./styles/global.css";              
-import "bootstrap/dist/css/bootstrap.min.css";
 
-// Lazy loading
+import "bootstrap/dist/css/bootstrap.min.css";
+import "./styles/global.css";
+
+// Lazy loading de páginas/componentes
 const MainContent    = lazy(() => import("./components/MainContent"));
 const ContactForm    = lazy(() => import("./components/ContactForm"));
 const ProductGallery = lazy(() => import("./components/ProductGallery"));
@@ -23,10 +25,11 @@ const App = () => {
   return (
     <AuthProvider>
       <Router>
-        <div className="App">
+        {/* Aquí usamos la clase .app-container */}
+        <div className="app-container">
           <Header />
 
-          {/* Este <main> ahora empuja el footer hacia abajo */}
+          {/* Y este main debe llevar .main-content */}
           <main className="main-content">
             <Suspense fallback={<div className="loading">Cargando...</div>}>
               <Routes>

@@ -1,15 +1,33 @@
+/* Layout principal: ocupa toda la pantalla y empuja el footer al fondo */
+html, body, #root {
+  height: 100%;
+  margin: 0;
+}
+
+.app-container {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.main-content {
+  flex: 1;
+}
+
+/* Fondo y tipografía generales */
 body {
   background: url('/img/background-image.jpg') no-repeat center center;
   background-size: cover;
   color: #f8f9fa;
   font-family: 'Arial', sans-serif;
 }
-  
-  h1, h2, h3, h4, h5, h6 {
-    color: #ffffff; 
-  }
-  
-  /* Mobile: fuentes y botones más compactos */
+
+/* Color de los encabezados */
+h1, h2, h3, h4, h5, h6 {
+  color: #ffffff; 
+}
+
+/* Mobile: fuentes y botones más compactos */
 @media (max-width: 576px) {
   .navbar-brand {
     font-size: 1rem;
@@ -24,7 +42,7 @@ body {
   }
 }
 
-/* Que las tablas (admin, carrito) hagan scroll horizontal si es muy angosto */
+/* Tablas responsivas: scroll horizontal en pantallas angostas */
 .table-responsive {
   overflow-x: auto;
 }
