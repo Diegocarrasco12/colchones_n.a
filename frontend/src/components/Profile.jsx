@@ -6,11 +6,11 @@ import axios from "axios";
 const apiURL = import.meta.env.VITE_API_BASE_URL;
 
 const Profile = () => {
-  const { user, logout, token } = useAuth();
+  const { user, logout, token, updateUser } = useAuth(); // <-- agregamos updateUser
   const navigate = useNavigate();
   const fileInputRef = useRef(null);
 
-  // Estado de la foto y posible error
+  // Vista previa de la imagen y posibles errores
   const [preview, setPreview] = useState("/img/default_avatar.png");
   const [error, setError] = useState("");
 
@@ -18,19 +18,18 @@ const Profile = () => {
   const [clients, setClients] = useState([]);
   const [products, setProducts] = useState([]);
 
-  // Al montar o cambiar user, cargo preview, clientes y productos
+  // Al cargar perfil
   useEffect(() => {
     if (!user) {
       navigate("/login");
       return;
     }
-
+    // Si ya hay imagen en user, la pongo de preview
     if (user.profileImage) {
       setPreview(`${apiURL}/${user.profileImage}`);
     }
-
+    // Si es admin, cargo clientes y productos
     if (user.role === "admin") {
-      // Cargo lista de clientes
       axios
         .get(`${apiURL}/api/admin/users`, {
           headers: { Authorization: `Bearer ${token}` },
@@ -38,7 +37,6 @@ const Profile = () => {
         .then((res) => setClients(res.data))
         .catch(console.error);
 
-      // Cargo productos
       axios
         .get(`${apiURL}/api/products`)
         .then((res) => setProducts(res.data))
@@ -46,10 +44,12 @@ const Profile = () => {
     }
   }, [user, navigate, token]);
 
-  // Abrir selector de archivo
-  const handleImageClick = () => fileInputRef.current.click();
+  // Hace click en el div para abrir selector
+  const handleImageClick = () => {
+    fileInputRef.current.click();
+  };
 
-  // Subir nueva foto
+  // Subida de archivo
   const handleFileChange = async (e) => {
     const file = e.target.files[0];
     if (!file) return;
@@ -58,11 +58,17 @@ const Profile = () => {
     formData.append("avatar", file);
 
     try {
-      await axios.put(
+      const res = await axios.put(
         `${apiURL}/api/auth/profile-image`,
         formData,
         { headers: { Authorization: `Bearer ${token}` } }
       );
+
+      // — NUEVO: actualizar user y localStorage con la nueva ruta —
+      const { imagePath } = res.data;
+      updateUser({ ...user, profileImage: imagePath });
+
+      // Actualizo vista previa con el archivo local
       setPreview(URL.createObjectURL(file));
       setError("");
     } catch (err) {
@@ -71,7 +77,7 @@ const Profile = () => {
     }
   };
 
-  // NUEVO: Cambiar rol de un usuario
+  // NUEVO: función para cambiar rol de usuarios
   const handleRoleChange = async (userId, newRole) => {
     try {
       await axios.put(
@@ -79,13 +85,8 @@ const Profile = () => {
         { role: newRole },
         { headers: { Authorization: `Bearer ${token}` } }
       );
-      // Actualizo estado local
       setClients((prev) =>
-        prev.map((c) =>
-          c.id === userId
-            ? { ...c, role: newRole }
-            : c
-        )
+        prev.map((c) => (c.id === userId ? { ...c, role: newRole } : c))
       );
     } catch (err) {
       console.error("❌ Error al cambiar rol:", err.response || err);
@@ -191,9 +192,7 @@ const Profile = () => {
                     <button className="btn btn-sm btn-warning me-2">
                       Editar
                     </button>
-                    <button className="btn btn-sm btn-danger">
-                      Borrar
-                    </button>
+                    <button className="btn btn-sm btn-danger">Borrar</button>
                   </div>
                 </div>
               ))}
@@ -210,7 +209,10 @@ const Profile = () => {
         <button className="btn btn-primary" onClick={() => navigate("/")}>
           Volver al Inicio
         </button>
-        <button className="btn btn-secondary" onClick={() => navigate("/profile")}>
+        <button
+          className="btn btn-secondary"
+          onClick={() => navigate("/profile")}
+        >
           Mi Perfil
         </button>
         <button
@@ -228,6 +230,7 @@ const Profile = () => {
 };
 
 export default Profile;
+
 
 
 
