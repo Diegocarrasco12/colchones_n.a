@@ -6,7 +6,7 @@ import axios from "axios";
 const apiURL = import.meta.env.VITE_API_BASE_URL;
 
 const Profile = () => {
-  const { user, logout, token, updateUser } = useAuth(); // <-- agregamos updateUser
+  const { user, logout, token, updateUser } = useAuth();
   const navigate = useNavigate();
   const fileInputRef = useRef(null);
 
@@ -18,17 +18,15 @@ const Profile = () => {
   const [clients, setClients] = useState([]);
   const [products, setProducts] = useState([]);
 
-  // Al cargar perfil
+  // Carga inicial de perfil, clientes y productos
   useEffect(() => {
     if (!user) {
       navigate("/login");
       return;
     }
-    // Si ya hay imagen en user, la pongo de preview
     if (user.profileImage) {
       setPreview(`${apiURL}/${user.profileImage}`);
     }
-    // Si es admin, cargo clientes y productos
     if (user.role === "admin") {
       axios
         .get(`${apiURL}/api/admin/users`, {
@@ -44,16 +42,11 @@ const Profile = () => {
     }
   }, [user, navigate, token]);
 
-  // Hace click en el div para abrir selector
-  const handleImageClick = () => {
-    fileInputRef.current.click();
-  };
-
-  // Subida de archivo
+  // — Subida de foto de perfil —
+  const handleImageClick = () => fileInputRef.current.click();
   const handleFileChange = async (e) => {
     const file = e.target.files[0];
     if (!file) return;
-
     const formData = new FormData();
     formData.append("avatar", file);
 
@@ -63,12 +56,10 @@ const Profile = () => {
         formData,
         { headers: { Authorization: `Bearer ${token}` } }
       );
-
-      // — NUEVO: actualizar user y localStorage con la nueva ruta —
+      // Persistir ruta en contexto y localStorage
       const { imagePath } = res.data;
       updateUser({ ...user, profileImage: imagePath });
 
-      // Actualizo vista previa con el archivo local
       setPreview(URL.createObjectURL(file));
       setError("");
     } catch (err) {
@@ -77,19 +68,57 @@ const Profile = () => {
     }
   };
 
-  // NUEVO: función para cambiar rol de usuarios
-  const handleRoleChange = async (userId, newRole) => {
+  // — CRUD PRODUCTOS para admin —
+  const handleDeleteProduct = async (productId) => {
+    if (!window.confirm("¿Borrar este producto?")) return;
     try {
-      await axios.put(
-        `${apiURL}/api/admin/users/${userId}/role`,
-        { role: newRole },
+      await axios.delete(
+        `${apiURL}/api/admin/products/${productId}`,
         { headers: { Authorization: `Bearer ${token}` } }
       );
-      setClients((prev) =>
-        prev.map((c) => (c.id === userId ? { ...c, role: newRole } : c))
+      setProducts((prev) => prev.filter((p) => p.id !== productId));
+    } catch (err) {
+      console.error("❌ Error al borrar producto:", err.response || err);
+    }
+  };
+
+  const handleEditProduct = async (product) => {
+    const newName = window.prompt("Nuevo nombre:", product.name);
+    if (newName == null) return;
+    const newPriceStr = window.prompt("Nuevo precio:", product.price);
+    if (newPriceStr == null) return;
+    const newPrice = Number(newPriceStr);
+    try {
+      await axios.put(
+        `${apiURL}/api/admin/products/${product.id}`,
+        { name: newName, price: newPrice },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      setProducts((prev) =>
+        prev.map((p) =>
+          p.id === product.id ? { ...p, name: newName, price: newPrice } : p
+        )
       );
     } catch (err) {
-      console.error("❌ Error al cambiar rol:", err.response || err);
+      console.error("❌ Error al editar producto:", err.response || err);
+    }
+  };
+
+  const handleAddProduct = async () => {
+    const name = window.prompt("Nombre del nuevo producto:");
+    if (!name) return;
+    const priceStr = window.prompt("Precio del nuevo producto:");
+    if (priceStr == null) return;
+    const price = Number(priceStr);
+    try {
+      const res = await axios.post(
+        `${apiURL}/api/admin/products`,
+        { name, price },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      setProducts((prev) => [...prev, res.data]);
+    } catch (err) {
+      console.error("❌ Error al agregar producto:", err.response || err);
     }
   };
 
@@ -102,7 +131,7 @@ const Profile = () => {
         <strong>Email:</strong> {user.email}
       </p>
 
-      {/* — Foto de perfil clicable — */}
+      {/* Foto de perfil clicable */}
       <div className="text-center mb-5">
         <h5>Cambiar Foto de Perfil</h5>
         <div
@@ -137,10 +166,10 @@ const Profile = () => {
         {error && <p className="text-danger">{error}</p>}
       </div>
 
-      {/* — Sección ADMIN (solo si role === 'admin') — */}
+      {/* Sección ADMIN */}
       {user.role === "admin" && (
         <>
-          {/* Lista de Clientes con selector de rol */}
+          {/* Clientes Registrados */}
           <div className="card mb-4">
             <div className="card-header">Clientes Registrados</div>
             <div className="card-body p-0">
@@ -162,7 +191,22 @@ const Profile = () => {
                           className="form-select form-select-sm"
                           value={c.role}
                           onChange={(e) =>
-                            handleRoleChange(c.id, e.target.value)
+                            axios
+                              .put(
+                                `${apiURL}/api/admin/users/${c.id}/role`,
+                                { role: e.target.value },
+                                { headers: { Authorization: `Bearer ${token}` } }
+                              )
+                              .then(() =>
+                                setClients((prev) =>
+                                  prev.map((u) =>
+                                    u.id === c.id
+                                      ? { ...u, role: e.target.value }
+                                      : u
+                                  )
+                                )
+                              )
+                              .catch(console.error)
                           }
                         >
                           <option value="user">user</option>
@@ -189,14 +233,25 @@ const Profile = () => {
                     {p.name} — ${p.price}
                   </span>
                   <div>
-                    <button className="btn btn-sm btn-warning me-2">
+                    <button
+                      className="btn btn-sm btn-warning me-2"
+                      onClick={() => handleEditProduct(p)}
+                    >
                       Editar
                     </button>
-                    <button className="btn btn-sm btn-danger">Borrar</button>
+                    <button
+                      className="btn btn-sm btn-danger"
+                      onClick={() => handleDeleteProduct(p.id)}
+                    >
+                      Borrar
+                    </button>
                   </div>
                 </div>
               ))}
-              <button className="btn btn-sm btn-success">
+              <button
+                className="btn btn-sm btn-success"
+                onClick={handleAddProduct}
+              >
                 Agregar Nuevo Producto
               </button>
             </div>
@@ -204,9 +259,12 @@ const Profile = () => {
         </>
       )}
 
-      {/* — Botones de navegación — */}
+      {/* Botones de navegación */}
       <div className="d-flex justify-content-center gap-3">
-        <button className="btn btn-primary" onClick={() => navigate("/")}>
+        <button
+          className="btn btn-primary"
+          onClick={() => navigate("/")}
+        >
           Volver al Inicio
         </button>
         <button
@@ -230,6 +288,7 @@ const Profile = () => {
 };
 
 export default Profile;
+
 
 
 
