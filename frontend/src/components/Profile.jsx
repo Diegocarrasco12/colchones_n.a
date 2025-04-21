@@ -11,9 +11,9 @@ const Profile = () => {
   const [error, setError] = useState("");
 
   useEffect(() => {
-    if (!user) navigate("/login");
-
-    if (user?.profileImage) {
+    if (!user) {
+      navigate("/login");
+    } else if (user?.profileImage) {
       setPreview(`${import.meta.env.VITE_API_BASE_URL}/${user.profileImage}`);
     }
   }, [user, navigate]);
@@ -38,6 +38,7 @@ const Profile = () => {
             "Content-Type": "multipart/form-data",
             Authorization: `Bearer ${token}`,
           },
+          withCredentials: true,
         }
       );
 
@@ -94,7 +95,13 @@ const Profile = () => {
         {error && <p className="text-danger">{error}</p>}
       </div>
 
-      <button className="btn btn-danger mt-4" onClick={() => { logout(); navigate("/"); }}>
+      <button
+        className="btn btn-danger mt-4"
+        onClick={() => {
+          logout();
+          navigate("/");
+        }}
+      >
         Cerrar Sesión
       </button>
     </div>
