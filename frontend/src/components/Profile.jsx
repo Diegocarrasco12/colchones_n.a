@@ -13,7 +13,9 @@ const Profile = () => {
   useEffect(() => {
     if (!user) {
       navigate("/login");
-    } else if (user?.profileImage) {
+      return;
+    }
+    if (user.profileImage) {
       setPreview(`${import.meta.env.VITE_API_BASE_URL}/${user.profileImage}`);
     }
   }, [user, navigate]);
@@ -27,15 +29,16 @@ const Profile = () => {
     if (!file) return;
 
     const formData = new FormData();
-    formData.append("profileImage", file);
+    formData.append("avatar", file);
+
+    console.log("Enviando token:", token);
 
     try {
-      await axios.put(
+      const res = await axios.put(
         `${import.meta.env.VITE_API_BASE_URL}/api/auth/profile-image`,
         formData,
         {
           headers: {
-            "Content-Type": "multipart/form-data",
             Authorization: `Bearer ${token}`,
           },
           withCredentials: true,
@@ -45,7 +48,7 @@ const Profile = () => {
       setPreview(URL.createObjectURL(file));
       setError("");
     } catch (err) {
-      console.error("❌ Error al subir imagen:", err);
+      console.error("❌ Error al subir imagen:", err.response || err);
       setError("Error al subir imagen.");
     }
   };
@@ -109,3 +112,4 @@ const Profile = () => {
 };
 
 export default Profile;
+

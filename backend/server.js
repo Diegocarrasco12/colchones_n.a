@@ -6,20 +6,25 @@ const path = require("path");
 const app = express();
 
 // 🔹 Crear carpeta uploads/profile_images si no existe
-const uploadDir = path.join(__dirname, "uploads/profile_images");
+const uploadDir = path.join(__dirname, "uploads", "profile_images");
 if (!fs.existsSync(uploadDir)) {
   fs.mkdirSync(uploadDir, { recursive: true });
   console.log("📁 Carpeta de uploads creada:", uploadDir);
 }
 
-// 🔹 Configuración de CORS con variable de entorno
+// 🔹 Configuración de CORS (asegúrate de definir ALLOW_ORIGIN_URL en .env)
+const FRONTEND_URL = process.env.ALLOW_ORIGIN_URL;
+if (!FRONTEND_URL) {
+  console.warn(
+    "⚠️  ALLOW_ORIGIN_URL no está definida. Pon tu dominio de front en .env"
+  );
+}
 const corsOptions = {
-  origin: process.env.ALLOW_ORIGIN_URL || "*",
+  origin: FRONTEND_URL,
   methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
   allowedHeaders: ["Content-Type", "Authorization"],
   credentials: true,
 };
-
 app.use(cors(corsOptions));
 app.options("*", cors(corsOptions));
 
@@ -27,37 +32,28 @@ app.options("*", cors(corsOptions));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// ✅ Servir archivos estáticos desde uploads (para imágenes de perfil, etc.)
-app.use("/uploads", express.static("uploads"));
+// ✅ Servir archivos estáticos de /uploads
+app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
-// 🔹 Encabezados CORS extra (opcional pero seguro)
-app.use((req, res, next) => {
-  res.header("Access-Control-Allow-Origin", process.env.ALLOW_ORIGIN_URL || "*");
-  res.header("Access-Control-Allow-Credentials", "true");
-  res.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
-  res.header("Access-Control-Allow-Headers", "Content-Type, Authorization");
-  next();
-});
-
-// ✅ Importar rutas
+// 🔹 Importar rutas
 const authRoutes = require("./routes/authRoutes");
 const productRoutes = require("./routes/productRoutes");
 const contactRoutes = require("./routes/contactRoutes");
 const adminRoutes = require("./routes/adminRoutes");
 
-// 🔹 Rutas principales
+// 🔹 Montar rutas
 app.use("/api/auth", authRoutes);
 app.use("/api/products", productRoutes);
 app.use("/api/contact", contactRoutes);
-app.use("/api/admin", adminRoutes); // 
+app.use("/api/admin", adminRoutes);
 
 // 🔹 Ruta raíz de prueba
 app.get("/", (req, res) => {
   res.send("🚀 Backend funcionando correctamente!");
 });
 
-// 🔹 Manejo de rutas no encontradas
-app.use((req, res, next) => {
+// 🔹 404 para rutas no encontradas
+app.use((req, res) => {
   res.status(404).json({ error: "Ruta no encontrada" });
 });
 
@@ -67,11 +63,12 @@ app.use((err, req, res, next) => {
   res.status(500).json({ error: "Error interno del servidor" });
 });
 
-// 🔹 Puerto
+// 🔹 Levantar servidor
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, "0.0.0.0", () => {
   console.log(`Servidor corriendo en el puerto ${PORT}`);
 });
+
 
 
 
