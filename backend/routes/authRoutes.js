@@ -8,9 +8,9 @@ const {
 } = require("../controllers/authController");
 const authMiddleware = require("../middlewares/authMiddleware");
 
-// Importamos la carga de archivo y el controlador juntos
+// Importamos el middleware y el controlador de imagen de perfil
 const {
-  uploadMiddleware,      // esto ya es upload.single("avatar")
+  uploadMiddleware,      // upload.single("avatar")
   uploadProfileImage,
 } = require("../controllers/profileImageController");
 
@@ -18,13 +18,10 @@ const {
 router.post("/register", register);
 router.post("/login", login);
 
-// 🔹 Perfil del usuario autenticado
+// 🔹 Obtener perfil del usuario autenticado
 router.get("/profile", authMiddleware, getProfile);
 
 // ✅ Subir o actualizar imagen de perfil
-//    - authMiddleware primero valida el JWT
-//    - luego uploadMiddleware (.single("avatar"))
-//    - luego uploadProfileImage guarda la ruta en BD
 router.put(
   "/profile-image",
   authMiddleware,
@@ -38,3 +35,4 @@ router.get("/", (req, res) => {
 });
 
 module.exports = router;
+

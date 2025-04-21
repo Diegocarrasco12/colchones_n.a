@@ -1,7 +1,6 @@
 const path = require("path");
 const db = require("../config/db");
-// Importamos el multer configurado
-const upload = require("../middleware/uploadMiddleware");
+const upload = require("../middlewares/uploadMiddleware");
 
 const uploadProfileImage = async (req, res) => {
   try {
@@ -9,7 +8,7 @@ const uploadProfileImage = async (req, res) => {
       return res.status(400).json({ error: "No se subió ningún archivo" });
     }
 
-    // Ruta relativa para guardar en la BD
+    // Construimos la ruta relativa para guardar en la BD
     const imagePath = path.join("uploads", "profile_images", req.file.filename);
 
     await db.query(
@@ -27,7 +26,8 @@ const uploadProfileImage = async (req, res) => {
 };
 
 module.exports = {
-  // Usamos el mismo nombre de campo que en el frontend: "avatar"
+  // Usamos el mismo campo que en el frontend: "avatar"
   uploadMiddleware: upload.single("avatar"),
   uploadProfileImage,
 };
+
