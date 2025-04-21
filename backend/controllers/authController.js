@@ -7,7 +7,6 @@ const register = async (req, res) => {
   try {
     const { fullName, email, password } = req.body;
 
-    // Verificar si ya existe el usuario
     const existingUser = await db.query(
       'SELECT * FROM users WHERE email = $1',
       [email]
@@ -17,11 +16,10 @@ const register = async (req, res) => {
       return res.status(400).json({ error: "El usuario ya existe" });
     }
 
-    // Hashear contraseña
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
 
-    // Insertar nuevo usuario (por defecto con rol "user")
+    // Insertar usuario sin imagen de perfil por defecto
     await db.query(
       'INSERT INTO users (name, email, password) VALUES ($1, $2, $3)',
       [fullName, email, hashedPassword]
@@ -56,7 +54,7 @@ const login = async (req, res) => {
     const token = jwt.sign(
       {
         id: user.rows[0].id,
-        role: user.rows[0].role, // ✅ incluir el rol en el token
+        role: user.rows[0].role,
       },
       process.env.JWT_SECRET,
       { expiresIn: "1h" }
@@ -69,7 +67,8 @@ const login = async (req, res) => {
         id: user.rows[0].id,
         name: user.rows[0].name,
         email: user.rows[0].email,
-        role: user.rows[0].role, // ✅ incluir el rol en la respuesta
+        role: user.rows[0].role,
+        profileImage: user.rows[0].profileimage || null,
       },
     });
   } catch (error) {
@@ -82,7 +81,7 @@ const login = async (req, res) => {
 const getProfile = async (req, res) => {
   try {
     const user = await db.query(
-      'SELECT id, name, email, role FROM users WHERE id = $1',
+      'SELECT id, name, email, role, profileimage FROM users WHERE id = $1',
       [req.user.id]
     );
 
@@ -90,7 +89,10 @@ const getProfile = async (req, res) => {
       return res.status(404).json({ error: "Usuario no encontrado" });
     }
 
-    res.json(user.rows[0]);
+    res.json({
+      ...user.rows[0],
+      profileImage: user.rows[0].profileimage || null,
+    });
   } catch (error) {
     console.error("❌ Error al obtener perfil:", error);
     res.status(500).json({ error: "Error en el servidor" });
@@ -98,4 +100,5 @@ const getProfile = async (req, res) => {
 };
 
 module.exports = { register, login, getProfile };
+
 

@@ -7,7 +7,7 @@ const Profile = () => {
   const { user, logout, token } = useAuth();
   const navigate = useNavigate();
   const fileInputRef = useRef(null);
-  const [preview, setPreview] = useState(null);
+  const [preview, setPreview] = useState("/img/default_avatar.png");
   const [error, setError] = useState("");
 
   useEffect(() => {
@@ -15,8 +15,6 @@ const Profile = () => {
 
     if (user?.profileImage) {
       setPreview(`${import.meta.env.VITE_API_BASE_URL}/${user.profileImage}`);
-    } else {
-      setPreview("/img/default_avatar.png");
     }
   }, [user, navigate]);
 
@@ -43,7 +41,7 @@ const Profile = () => {
         }
       );
 
-      setPreview(URL.createObjectURL(file)); 
+      setPreview(URL.createObjectURL(file));
       setError("");
     } catch (err) {
       console.error("❌ Error al subir imagen:", err);
@@ -77,6 +75,10 @@ const Profile = () => {
           <img
             src={preview}
             alt="Foto de perfil"
+            onError={(e) => {
+              e.target.onerror = null;
+              e.target.src = "/img/default_avatar.png";
+            }}
             style={{ width: "100%", height: "100%", objectFit: "cover" }}
           />
         </div>
